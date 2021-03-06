@@ -91,8 +91,8 @@ public class PokemonSpec {
 
         if (this.allowEvolutions) {
             if (!Objects.equals(this.species, pokemon.getSpecies())) {
-                for (EnumSpecies preEvolution : pokemon.getBaseStats().preEvolutions) {
-                    if (Objects.equals(preEvolution, pokemon.getSpecies())) {
+                for (String preEvolution : pokemon.getBaseStats().preEvolutions) {
+                    if (preEvolution.equals(pokemon.getSpecies().name)) {
                         return true;
                     }
                 }
