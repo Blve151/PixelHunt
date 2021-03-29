@@ -1,6 +1,7 @@
 package com.xpgaming.pixelhunt.commands;
 
 
+import ca.landonjw.gooeylibs.api.UIManager;
 import com.xpgaming.pixelhunt.Config;
 import com.xpgaming.pixelhunt.Main;
 import com.xpgaming.pixelhunt.ui.HuntUI;
@@ -13,6 +14,8 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+
+import static com.xpgaming.pixelhunt.ui.HuntUI.menu;
 
 public class Hunt implements CommandExecutor {
 
@@ -85,9 +88,9 @@ public class Hunt implements CommandExecutor {
 
         if(src instanceof Player){
             EntityPlayerMP player = (EntityPlayerMP) src;
-            HuntUI.menuUI(player).forceOpenPage(player);
+            UIManager.openUIForcefully(player, menu(player));
         }else{
-            src.sendMessage(Text.of(Utils.regex("&cOnly players can run this command.")));
+            src.sendMessage(Text.of(Utils.regex("&cOnly players can run this command!")));
         }
         return CommandResult.success();
     }

@@ -1,6 +1,7 @@
 package com.xpgaming.pixelhunt.utils;
 
-import ca.landonjw.gooeylibs.inventory.api.Button;
+import ca.landonjw.gooeylibs.api.button.Button;
+import ca.landonjw.gooeylibs.api.button.GooeyButton;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumNature;
@@ -202,10 +203,10 @@ public class Utils {
         return line;
     }
 
-    public static Button colouredPane(EnumDyeColor color) {
-        return Button.builder()
-                .item(new net.minecraft.item.ItemStack(Blocks.STAINED_GLASS_PANE, 1, color.getMetadata()))
-                .displayName("")
+    public static Button colouredPane(int num) {
+        return GooeyButton.builder()
+                .title("")
+                .display(new net.minecraft.item.ItemStack(Blocks.STAINED_GLASS_PANE, 1, num))
                 .build();
     }
 

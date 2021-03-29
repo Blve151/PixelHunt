@@ -1,6 +1,5 @@
 package com.xpgaming.pixelhunt;
 
-import ca.landonjw.gooeylibs.inventory.api.InventoryAPI;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.xpgaming.pixelhunt.commands.Hunt;
 import com.xpgaming.pixelhunt.commands.NewHunt;
@@ -163,7 +162,6 @@ public class Main {
 
     @Listener
     public void onGamePreInitialization(GamePreInitializationEvent event) {
-    	InventoryAPI.register();
 		Pixelmon.EVENT_BUS.register(new CaptureListener());
 		Pixelmon.EVENT_BUS.register(new PixelmonSpawnListener());
 		MinecraftForge.EVENT_BUS.register(new PixelmonSpawnListener());
