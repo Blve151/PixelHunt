@@ -179,7 +179,7 @@ public class Main {
 			Utils.getInstance().initialisePokemon();
 			initialised = true;
 		}
-		consoleMsg("§f[§6xP//§f] §ePixelHunt - Loaded v1.2.1!");
+		consoleMsg("§f[§6xP//§f] §ePixelHunt - Loaded Successfully");
 		consoleMsg("§f[§6xP//§f] §eBy Xenoyia with help from happyzlife, FrostEffects and XpanD!");
 		consoleMsg("§f[§6xP//§f] §eUpdated by Blue.");
 

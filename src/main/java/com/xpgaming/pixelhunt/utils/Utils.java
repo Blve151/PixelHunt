@@ -323,8 +323,9 @@ public class Utils {
 
         String unitDays = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "unitDays").getString();
         String unitHours = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "unitHours").getString();
+        String unitMinutes = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "unitMinutes").getString();
         String unitSeconds = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "unitSeconds").getString();
-        return "&f" + days + "&b" + unitDays + " " + "&f" + hours + "&b" + unitHours + " " + "&f" + seconds + "&b" + unitSeconds + " ";
+        return "&f" + days + "&b" + unitDays + " &f" + hours + "&b" + unitHours + " &f" + minutes + "&b" + unitMinutes + " &f" + seconds + "&b" + unitSeconds;
     }
 
     public int isInHunt(Pokemon pokemon) {
