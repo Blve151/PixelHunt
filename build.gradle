@@ -14,7 +14,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 compileJava.options.encoding = 'UTF-8'
 
-version = "-gui-blue-1.12.2-1.2.6"
+version = "-gui-blue-1.12.2-1.2.7"
 group = "com.xpgaming.pixelhunt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "pixelhunt"
 

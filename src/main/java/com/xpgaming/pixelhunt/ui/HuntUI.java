@@ -1,17 +1,16 @@
 package com.xpgaming.pixelhunt.ui;
 
-import ca.landonjw.gooeylibs.api.button.Button;
-import ca.landonjw.gooeylibs.api.button.GooeyButton;
-import ca.landonjw.gooeylibs.api.button.PlaceholderButton;
-import ca.landonjw.gooeylibs.api.helpers.PaginationHelper;
-import ca.landonjw.gooeylibs.api.page.GooeyPage;
-import ca.landonjw.gooeylibs.api.page.LinkedPage;
-import ca.landonjw.gooeylibs.api.template.types.ChestTemplate;
+import ca.landonjw.gooeylibs2.api.button.Button;
+import ca.landonjw.gooeylibs2.api.button.GooeyButton;
+import ca.landonjw.gooeylibs2.api.button.PlaceholderButton;
+import ca.landonjw.gooeylibs2.api.helpers.PaginationHelper;
+import ca.landonjw.gooeylibs2.api.page.GooeyPage;
+import ca.landonjw.gooeylibs2.api.page.LinkedPage;
+import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
 
 import com.xpgaming.pixelhunt.Config;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 
 import java.util.Collections;

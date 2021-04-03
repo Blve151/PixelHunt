@@ -50,10 +50,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = Main.id, name = Main.name, version = "1.2.6",  description = "A Pixelmon sidemod to get rewards for catching certain Pokemon.",
+@Plugin(id = Main.id, name = Main.name, version = "1.2.7",  description = "A Pixelmon sidemod to get rewards for catching certain Pokemon.",
 		dependencies = {
 				@Dependency(id = "pixelmon"),
-				@Dependency(id = "gooeylibs")
+				@Dependency(id = "gooeylibs2")
 })
 public class Main {
 	private static Main instance;

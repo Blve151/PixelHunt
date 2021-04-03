@@ -1,7 +1,7 @@
 package com.xpgaming.pixelhunt.utils;
 
-import ca.landonjw.gooeylibs.api.button.Button;
-import ca.landonjw.gooeylibs.api.button.GooeyButton;
+import ca.landonjw.gooeylibs2.api.button.Button;
+import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;

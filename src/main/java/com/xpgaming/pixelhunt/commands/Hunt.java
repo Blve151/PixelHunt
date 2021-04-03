@@ -1,7 +1,7 @@
 package com.xpgaming.pixelhunt.commands;
 
 
-import ca.landonjw.gooeylibs.api.UIManager;
+import ca.landonjw.gooeylibs2.api.UIManager;
 import com.xpgaming.pixelhunt.Config;
 import com.xpgaming.pixelhunt.Main;
 import com.xpgaming.pixelhunt.ui.HuntUI;

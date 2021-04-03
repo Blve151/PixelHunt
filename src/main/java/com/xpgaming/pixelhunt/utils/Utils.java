@@ -1,7 +1,7 @@
 package com.xpgaming.pixelhunt.utils;
 
-import ca.landonjw.gooeylibs.api.button.Button;
-import ca.landonjw.gooeylibs.api.button.GooeyButton;
+import ca.landonjw.gooeylibs2.api.button.Button;
+import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumNature;
@@ -324,8 +324,7 @@ public class Utils {
         String unitDays = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "unitDays").getString();
         String unitHours = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "unitHours").getString();
         String unitSeconds = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "unitSeconds").getString();
-
-        return "\u00A7f" + days + "\u00A7b" + unitDays + "\u00A7f" + unitHours + "\u00A7b" + unitSeconds + "\u00A7f" + minutes + "\u00A7b" + unitSeconds + "\u00A7f" + seconds + "\u00A7bS\u00A77";
+        return "&f" + days + "&b" + unitDays + " " + "&f" + hours + "&b" + unitHours + " " + "&f" + seconds + "&b" + unitSeconds + " ";
     }
 
     public int isInHunt(Pokemon pokemon) {
