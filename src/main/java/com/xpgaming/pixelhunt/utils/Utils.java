@@ -2,183 +2,300 @@ package com.xpgaming.pixelhunt.utils;
 
 import ca.landonjw.gooeylibs2.api.button.Button;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
+import ca.landonjw.gooeylibs2.implementation.tasks.Task;
 import com.pixelmonmod.pixelmon.Pixelmon;
+import com.pixelmonmod.pixelmon.api.economy.IPixelmonBankAccount;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import com.pixelmonmod.pixelmon.config.PixelmonItems;
 import com.pixelmonmod.pixelmon.enums.EnumNature;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.items.ItemPixelmonSprite;
 import com.xpgaming.pixelhunt.Config;
-import com.xpgaming.pixelhunt.Main;
+import com.xpgaming.pixelhunt.PixelHuntForge;
 import com.xpgaming.pixelhunt.enums.EnumItems;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
 
-import java.math.BigDecimal;
+
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.xpgaming.pixelhunt.commands.Hunt.rewardList;
+import static com.xpgaming.pixelhunt.PixelHuntForge.*;
 
 public class Utils {
 
     private static Utils instance = new Utils();
 
+    public static Task announcementTask = null;
+    public static Task huntTimer1 = null;
+    public static Task huntTimer2 = null;
+    public static Task huntTimer3 = null;
+    public static Task huntTimer4 = null;
+
     public static Utils getInstance() {
         return instance;
     }
 
+    public static void giveItemStack(ItemStack i, EntityPlayerMP p) {
+        boolean foundEmpty = false;
+        for (ItemStack stack : p.inventory.mainInventory) {
+            if (stack != null) {
+                foundEmpty = true;
+                break;
+            }
+        }
+        if (foundEmpty) {
+            p.inventory.addItemStackToInventory(i);
+        } else {
+            World world = p.world;
+            BlockPos pos = p.getPosition();
+            EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ());
+            entityItem.setItem(i);
+            world.spawnEntity(entityItem);
+        }
+    }
+
+    public static void addMoney(EntityPlayerMP p, int amount) {
+        IPixelmonBankAccount bankAccount = Pixelmon.moneyManager.getBankAccount(p).get();
+        bankAccount.updatePlayer(bankAccount.getMoney() + amount);
+    }
+
+
+    public static void reloadAnnouncementTask() {
+
+        if (announcementTask != null) {
+            announcementTask.setExpired();
+        }
+
+        announcementTask = Task.builder()
+                .execute(task -> {
+                    if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "global-msg").getBoolean()) {
+                        sendServer(Utils.prefix() + Utils.lang("announcement-message"));
+                    }
+                })
+                .interval((Config.getInstance().getConfig().getNode("pixelhunt", "general", "announcement-timer").getInt() * 60L) * 20)
+                .infinite()
+                .build();
+    }
+
     private static final SecureRandom random = new SecureRandom();
 
+    public static String rewardList(int num) {
+        String strList = "";
+        String balls = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "balls").getString();
+        String money = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "money").getString();
+        String candies = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "candies").getString();
+        String other = Config.getInstance().getConfig().getNode("pixelhunt", "lang", "other").getString();
+        if (num == 1) {
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-balls").getBoolean())
+                strList = "\u00A7d" + balls + ": \u00A7f" + PixelHuntForge.pokemon1ballReward.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-money").getBoolean())
+                strList = strList + "\u00A72" + money + ": \u00A7f" + PixelHuntForge.pokemon1moneyReward + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-candy").getBoolean())
+                strList = strList + "\u00A73" + candies + ": \u00A7f" + PixelHuntForge.pokemon1rc.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-toggle").getBoolean())
+                strList = strList + "\u00A74" + other + ": \u00A7f" + PixelHuntForge.pokemon1msg + " ";
+        } else if (num == 2) {
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-balls").getBoolean())
+                strList = "\u00A7d" + balls + ": \u00A7f" + PixelHuntForge.pokemon2ballReward.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-money").getBoolean())
+                strList = strList + "\u00A72" + money + ": \u00A7f" + PixelHuntForge.pokemon2moneyReward + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-candy").getBoolean())
+                strList = strList + "\u00A73" + candies + ": \u00A7f" + PixelHuntForge.pokemon2rc.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-toggle").getBoolean())
+                strList = strList + "\u00A74" + other + ": \u00A7f" + PixelHuntForge.pokemon2msg + " ";
+        } else if (num == 3) {
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-balls").getBoolean())
+                strList = "\u00A7d" + balls + ": \u00A7f" + PixelHuntForge.pokemon3ballReward.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-money").getBoolean())
+                strList = strList + "\u00A72" + money + ": \u00A7f" + PixelHuntForge.pokemon3moneyReward + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-candy").getBoolean())
+                strList = strList + "\u00A73" + candies + ": \u00A7f" + PixelHuntForge.pokemon3rc.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-toggle").getBoolean())
+                strList = strList + "\u00A74" + other + ": \u00A7f" + PixelHuntForge.pokemon3msg + " ";
+        } else if (num == 4) {
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-balls").getBoolean())
+                strList = "\u00A7d" + balls + ": \u00A7f" + PixelHuntForge.pokemon4ballReward.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-money").getBoolean())
+                strList = strList + "\u00A72" + money + ": \u00A7f" + PixelHuntForge.pokemon4moneyReward + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "give-candy").getBoolean())
+                strList = strList + "\u00A73" + candies + ": \u00A7f" + PixelHuntForge.pokemon4rc.getCount() + " ";
+
+            if (Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-toggle").getBoolean())
+                strList = strList + "\u00A74" + other + ": \u00A7f" + PixelHuntForge.pokemon4msg + " ";
+        } else {
+            strList = "Error!";
+        }
+
+        return strList;
+    }
 
     public void randomisePokemon(int slot) {
         switch (slot) {
             case 1:
                 cancelTimers(1);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(Main.pokemon1)) {
+                    PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(PixelHuntForge.pokemon1)) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                    else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
                 }
-                Main.nature1 = randomEnum(EnumNature.class).toString();
-                Main.nature1b = randomEnum(EnumNature.class).toString();
-                while (Main.nature1b.equalsIgnoreCase(Main.nature1))
-                    Main.nature1b = randomEnum(EnumNature.class).toString();
-                Main.nature1c = randomEnum(EnumNature.class).toString();
-                while (Main.nature1c.equalsIgnoreCase(Main.nature1b) || Main.nature1c.equalsIgnoreCase(Main.nature1))
-                    Main.nature1c = randomEnum(EnumNature.class).toString();
-                if (getUncommonPokemon().contains(Main.pokemon1)) Main.pokemon1rc = randomRareCandy(1);
-                else Main.pokemon1rc = randomRareCandy(0);
-                if (getUncommonPokemon().contains(Main.pokemon1)) {
-                    Main.pokemon1ballReward = randomBall(1, 1);
-                    Main.pokemon1moneyReward = randomMoney(1);
-                    Main.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon1)) {
-                    Main.pokemon1rc = randomRareCandy(2);
-                    Main.pokemon1ballReward = randomBall(1, 2);
-                    Main.pokemon1moneyReward = randomMoney(2);
-                    Main.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+                PixelHuntForge.nature1 = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature1b = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature1b.equalsIgnoreCase(PixelHuntForge.nature1))
+                    PixelHuntForge.nature1b = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature1c = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature1c.equalsIgnoreCase(PixelHuntForge.nature1b) || PixelHuntForge.nature1c.equalsIgnoreCase(PixelHuntForge.nature1))
+                    PixelHuntForge.nature1c = randomEnum(EnumNature.class).toString();
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon1))
+                    PixelHuntForge.pokemon1rc = randomRareCandy(1);
+                else PixelHuntForge.pokemon1rc = randomRareCandy(0);
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon1)) {
+                    PixelHuntForge.pokemon1ballReward = randomBall(1, 1);
+                    PixelHuntForge.pokemon1moneyReward = randomMoney(1);
+                    PixelHuntForge.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+                } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon1)) {
+                    PixelHuntForge.pokemon1rc = randomRareCandy(2);
+                    PixelHuntForge.pokemon1ballReward = randomBall(1, 2);
+                    PixelHuntForge.pokemon1moneyReward = randomMoney(2);
+                    PixelHuntForge.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
                 } else {
-                    Main.pokemon1ballReward = randomBall(1, 0);
-                    Main.pokemon1moneyReward = randomMoney(0);
-                    Main.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+                    PixelHuntForge.pokemon1ballReward = randomBall(1, 0);
+                    PixelHuntForge.pokemon1moneyReward = randomMoney(0);
+                    PixelHuntForge.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
                 }
                 startTimer(1);
                 break;
             case 2:
                 cancelTimers(2);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(Main.pokemon2)) {
+                    pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(pokemon2)) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                    else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
                 }
-                Main.nature2 = randomEnum(EnumNature.class).toString();
-                Main.nature2b = randomEnum(EnumNature.class).toString();
-                while (Main.nature2b.equalsIgnoreCase(Main.nature2))
-                    Main.nature2b = randomEnum(EnumNature.class).toString();
-                Main.nature2c = randomEnum(EnumNature.class).toString();
-                while (Main.nature2c.equalsIgnoreCase(Main.nature2b) || Main.nature2c.equalsIgnoreCase(Main.nature2))
-                    Main.nature2c = randomEnum(EnumNature.class).toString();
-                if (getUncommonPokemon().contains(Main.pokemon2)) Main.pokemon2rc = randomRareCandy(1);
-                else Main.pokemon2rc = randomRareCandy(0);
-                if (getUncommonPokemon().contains(Main.pokemon2)) {
-                    Main.pokemon2ballReward = randomBall(2, 1);
-                    Main.pokemon2moneyReward = randomMoney(1);
-                    Main.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon2)) {
-                    Main.pokemon2rc = randomRareCandy(2);
-                    Main.pokemon2ballReward = randomBall(2, 2);
-                    Main.pokemon2moneyReward = randomMoney(2);
-                    Main.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+                PixelHuntForge.nature2 = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature2b = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature2b.equalsIgnoreCase(PixelHuntForge.nature2))
+                    PixelHuntForge.nature2b = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature2c = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature2c.equalsIgnoreCase(PixelHuntForge.nature2b) || PixelHuntForge.nature2c.equalsIgnoreCase(PixelHuntForge.nature2))
+                    PixelHuntForge.nature2c = randomEnum(EnumNature.class).toString();
+                if (getUncommonPokemon().contains(pokemon2))
+                    PixelHuntForge.pokemon2rc = randomRareCandy(1);
+                else PixelHuntForge.pokemon2rc = randomRareCandy(0);
+                if (getUncommonPokemon().contains(pokemon2)) {
+                    PixelHuntForge.pokemon2ballReward = randomBall(2, 1);
+                    PixelHuntForge.pokemon2moneyReward = randomMoney(1);
+                    PixelHuntForge.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+                } else if (Utils.getRarePokemon().contains(pokemon2)) {
+                    PixelHuntForge.pokemon2rc = randomRareCandy(2);
+                    PixelHuntForge.pokemon2ballReward = randomBall(2, 2);
+                    PixelHuntForge.pokemon2moneyReward = randomMoney(2);
+                    PixelHuntForge.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
                 } else {
-                    Main.pokemon2ballReward = randomBall(2, 0);
-                    Main.pokemon2moneyReward = randomMoney(0);
-                    Main.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+                    PixelHuntForge.pokemon2ballReward = randomBall(2, 0);
+                    PixelHuntForge.pokemon2moneyReward = randomMoney(0);
+                    PixelHuntForge.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
                 }
                 startTimer(2);
                 break;
             case 3:
                 cancelTimers(3);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(Main.pokemon3)) {
+                    PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(PixelHuntForge.pokemon3)) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                    else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
                 }
-                Main.nature3 = randomEnum(EnumNature.class).toString();
-                Main.nature3b = randomEnum(EnumNature.class).toString();
-                while (Main.nature3b.equalsIgnoreCase(Main.nature3))
-                    Main.nature3b = randomEnum(EnumNature.class).toString();
-                Main.nature3c = randomEnum(EnumNature.class).toString();
-                while (Main.nature3c.equalsIgnoreCase(Main.nature3b) || Main.nature3c.equalsIgnoreCase(Main.nature3))
-                    Main.nature3c = randomEnum(EnumNature.class).toString();
-                if (getUncommonPokemon().contains(Main.pokemon3)) Main.pokemon3rc = randomRareCandy(1);
-                else Main.pokemon3rc = randomRareCandy(0);
-                if (getUncommonPokemon().contains(Main.pokemon3)) {
-                    Main.pokemon3ballReward = randomBall(3, 1);
-                    Main.pokemon3moneyReward = randomMoney(1);
-                    Main.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon3)) {
-                    Main.pokemon3rc = randomRareCandy(2);
-                    Main.pokemon3ballReward = randomBall(3, 2);
-                    Main.pokemon3moneyReward = randomMoney(2);
-                    Main.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+                PixelHuntForge.nature3 = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature3b = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature3b.equalsIgnoreCase(PixelHuntForge.nature3))
+                    PixelHuntForge.nature3b = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature3c = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature3c.equalsIgnoreCase(PixelHuntForge.nature3b) || PixelHuntForge.nature3c.equalsIgnoreCase(PixelHuntForge.nature3))
+                    PixelHuntForge.nature3c = randomEnum(EnumNature.class).toString();
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon3))
+                    PixelHuntForge.pokemon3rc = randomRareCandy(1);
+                else PixelHuntForge.pokemon3rc = randomRareCandy(0);
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon3)) {
+                    PixelHuntForge.pokemon3ballReward = randomBall(3, 1);
+                    PixelHuntForge.pokemon3moneyReward = randomMoney(1);
+                    PixelHuntForge.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+                } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon3)) {
+                    PixelHuntForge.pokemon3rc = randomRareCandy(2);
+                    PixelHuntForge.pokemon3ballReward = randomBall(3, 2);
+                    PixelHuntForge.pokemon3moneyReward = randomMoney(2);
+                    PixelHuntForge.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
                 } else {
-                    Main.pokemon3ballReward = randomBall(3, 0);
-                    Main.pokemon3moneyReward = randomMoney(0);
-                    Main.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+                    PixelHuntForge.pokemon3ballReward = randomBall(3, 0);
+                    PixelHuntForge.pokemon3moneyReward = randomMoney(0);
+                    PixelHuntForge.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
                 }
                 startTimer(3);
                 break;
             case 4:
                 cancelTimers(4);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(Main.pokemon4)) {
+                    PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(PixelHuntForge.pokemon4)) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+                    else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
                 }
-                Main.nature4 = randomEnum(EnumNature.class).toString();
-                Main.nature4b = randomEnum(EnumNature.class).toString();
-                while (Main.nature4b.equalsIgnoreCase(Main.nature4))
-                    Main.nature4b = randomEnum(EnumNature.class).toString();
-                Main.nature4c = randomEnum(EnumNature.class).toString();
-                while (Main.nature4c.equalsIgnoreCase(Main.nature4b) || Main.nature4c.equalsIgnoreCase(Main.nature4))
-                    Main.nature4c = randomEnum(EnumNature.class).toString();
-                if (getUncommonPokemon().contains(Main.pokemon4)) Main.pokemon4rc = randomRareCandy(1);
-                else Main.pokemon4rc = randomRareCandy(0);
-                if (getUncommonPokemon().contains(Main.pokemon4)) {
-                    Main.pokemon4ballReward = randomBall(4, 1);
-                    Main.pokemon4moneyReward = randomMoney(1);
-                    Main.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon4)) {
-                    Main.pokemon4rc = randomRareCandy(2);
-                    Main.pokemon4ballReward = randomBall(4, 2);
-                    Main.pokemon4moneyReward = randomMoney(2);
-                    Main.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+                PixelHuntForge.nature4 = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature4b = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature4b.equalsIgnoreCase(PixelHuntForge.nature4))
+                    PixelHuntForge.nature4b = randomEnum(EnumNature.class).toString();
+                PixelHuntForge.nature4c = randomEnum(EnumNature.class).toString();
+                while (PixelHuntForge.nature4c.equalsIgnoreCase(PixelHuntForge.nature4b) || PixelHuntForge.nature4c.equalsIgnoreCase(PixelHuntForge.nature4))
+                    PixelHuntForge.nature4c = randomEnum(EnumNature.class).toString();
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon4))
+                    PixelHuntForge.pokemon4rc = randomRareCandy(1);
+                else PixelHuntForge.pokemon4rc = randomRareCandy(0);
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon4)) {
+                    PixelHuntForge.pokemon4ballReward = randomBall(4, 1);
+                    PixelHuntForge.pokemon4moneyReward = randomMoney(1);
+                    PixelHuntForge.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+                } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon4)) {
+                    PixelHuntForge.pokemon4rc = randomRareCandy(2);
+                    PixelHuntForge.pokemon4ballReward = randomBall(4, 2);
+                    PixelHuntForge.pokemon4moneyReward = randomMoney(2);
+                    PixelHuntForge.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
                 } else {
-                    Main.pokemon4ballReward = randomBall(4, 0);
-                    Main.pokemon4moneyReward = randomMoney(0);
-                    Main.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+                    PixelHuntForge.pokemon4ballReward = randomBall(4, 0);
+                    PixelHuntForge.pokemon4moneyReward = randomMoney(0);
+                    PixelHuntForge.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
                 }
                 startTimer(4);
                 break;
@@ -228,24 +345,24 @@ public class Utils {
         lore.add(regex("&a&l" + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "natures").getString() + ":"));
         switch (nature) {
             case "nature1":
-                lore.add(regex("&e- " + Main.nature1));
-                lore.add(regex("&e- " + Main.nature1b));
-                lore.add(regex("&e- " + Main.nature1c));
+                lore.add(regex("&e- " + PixelHuntForge.nature1));
+                lore.add(regex("&e- " + PixelHuntForge.nature1b));
+                lore.add(regex("&e- " + PixelHuntForge.nature1c));
                 break;
             case "nature2":
-                lore.add(regex("&e- " + Main.nature2));
-                lore.add(regex("&e- " + Main.nature2b));
-                lore.add(regex("&e- " + Main.nature2c));
+                lore.add(regex("&e- " + PixelHuntForge.nature2));
+                lore.add(regex("&e- " + PixelHuntForge.nature2b));
+                lore.add(regex("&e- " + PixelHuntForge.nature2c));
                 break;
             case "nature3":
-                lore.add(regex("&e- " + Main.nature3));
-                lore.add(regex("&e- " + Main.nature3b));
-                lore.add(regex("&e- " + Main.nature3c));
+                lore.add(regex("&e- " + PixelHuntForge.nature3));
+                lore.add(regex("&e- " + PixelHuntForge.nature3b));
+                lore.add(regex("&e- " + PixelHuntForge.nature3c));
                 break;
             case "nature4":
-                lore.add(regex("&e- " + Main.nature4));
-                lore.add(regex("&e- " + Main.nature4b));
-                lore.add(regex("&e- " + Main.nature4c));
+                lore.add(regex("&e- " + PixelHuntForge.nature4));
+                lore.add(regex("&e- " + PixelHuntForge.nature4b));
+                lore.add(regex("&e- " + PixelHuntForge.nature4c));
                 break;
         }
 
@@ -270,16 +387,16 @@ public class Utils {
         LocalDateTime timeNow = LocalDateTime.now();
         switch (expiry) {
             case "expiry1":
-                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, Main.pokemon1expiry)));
+                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, PixelHuntForge.pokemon1expiry)));
                 break;
             case "expiry2":
-                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, Main.pokemon2expiry)));
+                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, PixelHuntForge.pokemon2expiry)));
                 break;
             case "expiry3":
-                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, Main.pokemon3expiry)));
+                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, PixelHuntForge.pokemon3expiry)));
                 break;
             case "expiry4":
-                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, Main.pokemon4expiry)));
+                lore.add(regex("&e- " + Utils.getInstance().calculateTimeDifference(timeNow, PixelHuntForge.pokemon4expiry)));
                 break;
         }
         return lore;
@@ -329,13 +446,13 @@ public class Utils {
     }
 
     public int isInHunt(Pokemon pokemon) {
-        if(pokemon == null){
+        if (pokemon == null) {
             return 0;
         }
-        Pokemon pokemon1 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(Main.pokemon1));
-        Pokemon pokemon2 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(Main.pokemon2));
-        Pokemon pokemon3 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(Main.pokemon3));
-        Pokemon pokemon4 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(Main.pokemon4));
+        Pokemon pokemon1 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon1));
+        Pokemon pokemon2 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon2));
+        Pokemon pokemon3 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon3));
+        Pokemon pokemon4 = Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon4));
 
         if (pokemon.getSpecies() == pokemon1.getSpecies()) {
             return 1;
@@ -358,111 +475,135 @@ public class Utils {
         switch (slot) {
             case 1:
                 cancelTimers(1);
-                if (getUncommonPokemon().contains(Main.pokemon1)) {
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon1)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-max").getInt();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon1)) {
+                } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon1)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-max").getInt();
                 }
                 hours = random.nextInt(max - min + 1) + min;
                 if (min == max) hours = max;
                 date = date.plusHours(hours);
-                Main.pokemon1expiry = date;
+                PixelHuntForge.pokemon1expiry = date;
 
-                Task.builder().execute(() -> {
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", Main.pokemon1)));
-                    randomisePokemon(slot);
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", Main.pokemon1)));
-                })
-                        .delay(hours, TimeUnit.HOURS)
-                        .name(slot + "HuntTimer")
-                        .submit(Main.getInstance());
+                huntTimer1 = Task.builder()
+                        .execute(task -> {
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", PixelHuntForge.pokemon1));
+                            randomisePokemon(slot);
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", PixelHuntForge.pokemon1));
+                        })
+                        .delay((hours * 3600L) * 20L)
+                        .build();
                 break;
             case 2:
                 cancelTimers(2);
-                if (getUncommonPokemon().contains(Main.pokemon2)) {
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon2)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-max").getInt();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon2)) {
+                } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon2)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-max").getInt();
                 }
                 hours = random.nextInt(max - min + 1) + min;
                 date = date.plusHours(hours);
                 if (min == max) hours = max;
-                Main.pokemon2expiry = date;
-                Task.builder().execute(() -> {
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", Main.pokemon2)));
-                    randomisePokemon(slot);
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", Main.pokemon2)));
-                })
-                        .delay(hours, TimeUnit.HOURS)
-                        .name(slot + "HuntTimer")
-                        .submit(Main.getInstance());
+                PixelHuntForge.pokemon2expiry = date;
+
+                huntTimer2 = Task.builder()
+                        .execute(task -> {
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", PixelHuntForge.pokemon2));
+                            randomisePokemon(slot);
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", PixelHuntForge.pokemon2));
+                        })
+                        .delay((hours * 3600L) * 20L)
+                        .build();
                 break;
             case 3:
                 cancelTimers(3);
-                if (getUncommonPokemon().contains(Main.pokemon3)) {
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon3)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-max").getInt();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon3)) {
+                } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon3)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-max").getInt();
                 }
                 hours = random.nextInt(max - min + 1) + min;
                 if (min == max) hours = max;
                 date = date.plusHours(hours);
-                Main.pokemon3expiry = date;
-                Task.builder().execute(() -> {
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", Main.pokemon3)));
-                    randomisePokemon(slot);
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", Main.pokemon3)));
-                })
-                        .delay(hours, TimeUnit.HOURS)
-                        .name(slot + "HuntTimer")
-                        .submit(Main.getInstance());
+                PixelHuntForge.pokemon3expiry = date;
+
+                huntTimer3 = Task.builder()
+                        .execute(task -> {
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", PixelHuntForge.pokemon3));
+                            randomisePokemon(slot);
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", PixelHuntForge.pokemon3));
+                        })
+                        .delay((hours * 3600L) * 20L)
+                        .build();
                 break;
             case 4:
                 cancelTimers(4);
-                if (getUncommonPokemon().contains(Main.pokemon4)) {
+                if (getUncommonPokemon().contains(PixelHuntForge.pokemon4)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "uncommon-pokemon-timer-max").getInt();
-                } else if (Utils.getRarePokemon().contains(Main.pokemon4)) {
+                } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon4)) {
                     min = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-min").getInt();
                     max = Config.getInstance().getConfig().getNode("pixelhunt", "general", "rare-pokemon-timer-max").getInt();
                 }
                 hours = random.nextInt(max - min + 1) + min;
                 if (min == max) hours = max;
                 date = date.plusHours(hours);
-                Main.pokemon4expiry = date;
-                Task.builder().execute(() -> {
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", Main.pokemon4)));
-                    randomisePokemon(slot);
-                    Sponge.getServer().getBroadcastChannel().send(Text.of(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", Main.pokemon4)));
-                })
-                        .delay(hours, TimeUnit.HOURS)
-                        .name(slot + "HuntTimer")
-                        .submit(Main.getInstance());
+                PixelHuntForge.pokemon4expiry = date;
+
+                huntTimer3 = Task.builder()
+                        .execute(task -> {
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", PixelHuntForge.pokemon4));
+                            randomisePokemon(slot);
+                            sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "new-hunt").getString().replace("<pokemon>", PixelHuntForge.pokemon4));
+                        })
+                        .delay((hours * 3600L) * 20L)
+                        .build();
                 break;
+        }
+    }
+
+    private void cancelTask (Task task){
+        if(task != null){
+            task.setExpired();
         }
     }
 
     public void cancelTimers(int slot) {
         if (slot == 0) {
-            Set<Task> tasks = Sponge.getScheduler().getTasksByName(1 + "HuntTimer");
-            tasks.addAll(Sponge.getScheduler().getTasksByName(2 + "HuntTimer"));
-            tasks.addAll(Sponge.getScheduler().getTasksByName(3 + "HuntTimer"));
-            tasks.addAll(Sponge.getScheduler().getTasksByName(4 + "HuntTimer"));
-            for (Task t : tasks) {
-                t.cancel();
-            }
+            cancelTask(huntTimer1);
+            cancelTask(huntTimer2);
+            cancelTask(huntTimer3);
+            cancelTask(huntTimer4);
         } else {
-            Set<Task> tasks = Sponge.getScheduler().getTasksByName(slot + "HuntTimer");
-            for (Task t : tasks) {
-                t.cancel();
+            switch (slot){
+                case 1:
+                    cancelTask(huntTimer1);
+                    break;
+                case 2:
+                    cancelTask(huntTimer2);
+                    break;
+                case 3:
+                    cancelTask(huntTimer3);
+                    break;
+                case 4:
+                    cancelTask(huntTimer4);
+                    break;
             }
         }
+    }
+
+    public static void sendServer(String string) {
+        server.getPlayerList().sendMessage(new TextComponentString(regex(string)));
+    }
+
+    public static void sendPlayer(EntityPlayerMP player, String string) {
+        player.sendMessage(new TextComponentString(regex(string)));
     }
 
     public int getRarity(String name) {
@@ -478,131 +619,130 @@ public class Utils {
     public void initialisePokemon() {
         cancelTimers(0);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-        while (getExcludedPokemon().contains(Main.pokemon1)) {
+            PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+        else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+        while (getExcludedPokemon().contains(PixelHuntForge.pokemon1)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else Main.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+            else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
         }
-        Main.nature1 = randomEnum(EnumNature.class).toString();
-        Main.nature1b = randomEnum(EnumNature.class).toString();
-        while (Main.nature1b.equalsIgnoreCase(Main.nature1)) Main.nature1b = randomEnum(EnumNature.class).toString();
-        Main.nature1c = randomEnum(EnumNature.class).toString();
-        while (Main.nature1c.equalsIgnoreCase(Main.nature1b) || Main.nature1c.equalsIgnoreCase(Main.nature1))
-            Main.nature1c = randomEnum(EnumNature.class).toString();
-        Main.pokemon1ballReward = randomBall(1, 0);
-        Main.pokemon1moneyReward = randomMoney(0);
-        Main.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
-        if (getUncommonPokemon().contains(Main.pokemon1)) {
-            Main.pokemon1moneyReward = randomMoney(1);
-            Main.pokemon1rc = randomRareCandy(1);
-            Main.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-        } else if (Utils.getRarePokemon().contains(Main.pokemon1)) {
-            Main.pokemon1moneyReward = randomMoney(2);
-            Main.pokemon1rc = randomRareCandy(2);
-            Main.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
-        } else Main.pokemon1rc = randomRareCandy(0);
+        PixelHuntForge.nature1 = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature1b = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature1b.equalsIgnoreCase(PixelHuntForge.nature1))
+            PixelHuntForge.nature1b = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature1c = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature1c.equalsIgnoreCase(PixelHuntForge.nature1b) || PixelHuntForge.nature1c.equalsIgnoreCase(PixelHuntForge.nature1))
+            PixelHuntForge.nature1c = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.pokemon1ballReward = randomBall(1, 0);
+        PixelHuntForge.pokemon1moneyReward = randomMoney(0);
+        PixelHuntForge.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+        if (getUncommonPokemon().contains(PixelHuntForge.pokemon1)) {
+            PixelHuntForge.pokemon1moneyReward = randomMoney(1);
+            PixelHuntForge.pokemon1rc = randomRareCandy(1);
+            PixelHuntForge.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+        } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon1)) {
+            PixelHuntForge.pokemon1moneyReward = randomMoney(2);
+            PixelHuntForge.pokemon1rc = randomRareCandy(2);
+            PixelHuntForge.pokemon1msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+        } else PixelHuntForge.pokemon1rc = randomRareCandy(0);
         startTimer(1);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-        while (getExcludedPokemon().contains(Main.pokemon2)) {
+            pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+        else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+        while (getExcludedPokemon().contains(pokemon2)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else Main.pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+            else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
         }
-        Main.nature2 = randomEnum(EnumNature.class).toString();
-        Main.nature2b = randomEnum(EnumNature.class).toString();
-        while (Main.nature2b.equalsIgnoreCase(Main.nature2)) Main.nature2b = randomEnum(EnumNature.class).toString();
-        Main.nature2c = randomEnum(EnumNature.class).toString();
-        while (Main.nature2c.equalsIgnoreCase(Main.nature2b) || Main.nature2c.equalsIgnoreCase(Main.nature2))
-            Main.nature2c = randomEnum(EnumNature.class).toString();
-        Main.pokemon2ballReward = randomBall(2, 0);
-        Main.pokemon2moneyReward = randomMoney(0);
-        Main.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
-        if (getUncommonPokemon().contains(Main.pokemon2)) {
-            Main.pokemon2moneyReward = randomMoney(1);
-            Main.pokemon2rc = randomRareCandy(1);
-            Main.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-        } else if (Utils.getRarePokemon().contains(Main.pokemon2)) {
-            Main.pokemon2moneyReward = randomMoney(2);
-            Main.pokemon2rc = randomRareCandy(2);
-            Main.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
-        } else Main.pokemon2rc = randomRareCandy(0);
+        PixelHuntForge.nature2 = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature2b = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature2b.equalsIgnoreCase(PixelHuntForge.nature2))
+            PixelHuntForge.nature2b = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature2c = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature2c.equalsIgnoreCase(PixelHuntForge.nature2b) || PixelHuntForge.nature2c.equalsIgnoreCase(PixelHuntForge.nature2))
+            PixelHuntForge.nature2c = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.pokemon2ballReward = randomBall(2, 0);
+        PixelHuntForge.pokemon2moneyReward = randomMoney(0);
+        PixelHuntForge.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+        if (getUncommonPokemon().contains(pokemon2)) {
+            PixelHuntForge.pokemon2moneyReward = randomMoney(1);
+            PixelHuntForge.pokemon2rc = randomRareCandy(1);
+            PixelHuntForge.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+        } else if (Utils.getRarePokemon().contains(pokemon2)) {
+            PixelHuntForge.pokemon2moneyReward = randomMoney(2);
+            PixelHuntForge.pokemon2rc = randomRareCandy(2);
+            PixelHuntForge.pokemon2msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+        } else PixelHuntForge.pokemon2rc = randomRareCandy(0);
         startTimer(2);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-        while (getExcludedPokemon().contains(Main.pokemon3)) {
+            PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+        else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+        while (getExcludedPokemon().contains(PixelHuntForge.pokemon3)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else Main.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+            else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
         }
-        Main.nature3 = randomEnum(EnumNature.class).toString();
-        Main.nature3b = randomEnum(EnumNature.class).toString();
-        while (Main.nature3b.equalsIgnoreCase(Main.nature3)) Main.nature3b = randomEnum(EnumNature.class).toString();
-        Main.nature3c = randomEnum(EnumNature.class).toString();
-        while (Main.nature3c.equalsIgnoreCase(Main.nature3b) || Main.nature3c.equalsIgnoreCase(Main.nature3))
-            Main.nature3c = randomEnum(EnumNature.class).toString();
-        Main.pokemon3ballReward = randomBall(3, 0);
-        Main.pokemon3moneyReward = randomMoney(0);
-        Main.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
-        if (getUncommonPokemon().contains(Main.pokemon3)) {
-            Main.pokemon3moneyReward = randomMoney(1);
-            Main.pokemon3rc = randomRareCandy(1);
-            Main.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-        } else if (Utils.getRarePokemon().contains(Main.pokemon3)) {
-            Main.pokemon3moneyReward = randomMoney(2);
-            Main.pokemon3rc = randomRareCandy(2);
-            Main.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
-        } else Main.pokemon3rc = randomRareCandy(0);
+        PixelHuntForge.nature3 = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature3b = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature3b.equalsIgnoreCase(PixelHuntForge.nature3))
+            PixelHuntForge.nature3b = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature3c = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature3c.equalsIgnoreCase(PixelHuntForge.nature3b) || PixelHuntForge.nature3c.equalsIgnoreCase(PixelHuntForge.nature3))
+            PixelHuntForge.nature3c = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.pokemon3ballReward = randomBall(3, 0);
+        PixelHuntForge.pokemon3moneyReward = randomMoney(0);
+        PixelHuntForge.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+        if (getUncommonPokemon().contains(PixelHuntForge.pokemon3)) {
+            PixelHuntForge.pokemon3moneyReward = randomMoney(1);
+            PixelHuntForge.pokemon3rc = randomRareCandy(1);
+            PixelHuntForge.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+        } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon3)) {
+            PixelHuntForge.pokemon3moneyReward = randomMoney(2);
+            PixelHuntForge.pokemon3rc = randomRareCandy(2);
+            PixelHuntForge.pokemon3msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+        } else PixelHuntForge.pokemon3rc = randomRareCandy(0);
         startTimer(3);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-        while (getExcludedPokemon().contains(Main.pokemon4)) {
+            PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+        else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+        while (getExcludedPokemon().contains(PixelHuntForge.pokemon4)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else Main.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
+            else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
         }
-        Main.nature4 = randomEnum(EnumNature.class).toString();
-        Main.nature4b = randomEnum(EnumNature.class).toString();
-        while (Main.nature4b.equalsIgnoreCase(Main.nature4)) Main.nature4b = randomEnum(EnumNature.class).toString();
-        Main.nature4c = randomEnum(EnumNature.class).toString();
-        while (Main.nature4c.equalsIgnoreCase(Main.nature4b) || Main.nature4c.equalsIgnoreCase(Main.nature4))
-            Main.nature4c = randomEnum(EnumNature.class).toString();
-        Main.pokemon4ballReward = randomBall(4, 0);
-        Main.pokemon4moneyReward = randomMoney(0);
-        Main.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
-        if (getUncommonPokemon().contains(Main.pokemon4)) {
-            Main.pokemon4moneyReward = randomMoney(1);
-            Main.pokemon4rc = randomRareCandy(1);
-            Main.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
-        } else if (Utils.getRarePokemon().contains(Main.pokemon4)) {
-            Main.pokemon4moneyReward = randomMoney(2);
-            Main.pokemon4rc = randomRareCandy(2);
-            Main.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
-        } else Main.pokemon4rc = randomRareCandy(0);
+        PixelHuntForge.nature4 = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature4b = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature4b.equalsIgnoreCase(PixelHuntForge.nature4))
+            PixelHuntForge.nature4b = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.nature4c = randomEnum(EnumNature.class).toString();
+        while (PixelHuntForge.nature4c.equalsIgnoreCase(PixelHuntForge.nature4b) || PixelHuntForge.nature4c.equalsIgnoreCase(PixelHuntForge.nature4))
+            PixelHuntForge.nature4c = randomEnum(EnumNature.class).toString();
+        PixelHuntForge.pokemon4ballReward = randomBall(4, 0);
+        PixelHuntForge.pokemon4moneyReward = randomMoney(0);
+        PixelHuntForge.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-common-msg").getString();
+        if (getUncommonPokemon().contains(PixelHuntForge.pokemon4)) {
+            PixelHuntForge.pokemon4moneyReward = randomMoney(1);
+            PixelHuntForge.pokemon4rc = randomRareCandy(1);
+            PixelHuntForge.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-uncommon-msg").getString();
+        } else if (Utils.getRarePokemon().contains(PixelHuntForge.pokemon4)) {
+            PixelHuntForge.pokemon4moneyReward = randomMoney(2);
+            PixelHuntForge.pokemon4rc = randomRareCandy(2);
+            PixelHuntForge.pokemon4msg = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "custom-rare-msg").getString();
+        } else PixelHuntForge.pokemon4rc = randomRareCandy(0);
         startTimer(4);
     }
 
-    public BigDecimal randomMoney(int rarity) {
-        if (Main.hasEconomy) {
-            Random rn = new Random();
-            int min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "common-money-min").getInt(), max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "common-money-max").getInt();
-            if (rarity == 1) {
-                min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "uncommon-money-min").getInt();
-                max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "uncommon-money-max").getInt();
-            } else if (rarity == 2) {
-                min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-money-min").getInt();
-                max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-money-max").getInt();
-            }
-            BigDecimal total = BigDecimal.valueOf(rn.nextInt(max - min + 1) + min);
-            return total;
-        } else {
-            return BigDecimal.valueOf(0);
+    public int randomMoney(int rarity) {
+        Random rn = new Random();
+        int min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "common-money-min").getInt(), max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "common-money-max").getInt();
+        if (rarity == 1) {
+            min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "uncommon-money-min").getInt();
+            max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "uncommon-money-max").getInt();
+        } else if (rarity == 2) {
+            min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-money-min").getInt();
+            max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-money-max").getInt();
         }
+        return (rn.nextInt(max - min + 1) + min);
     }
 
     public void executeCommand(int rarity, String name) {
@@ -618,7 +758,7 @@ public class Utils {
             else cmd2list.add(cmd2);
 
             for (String command : cmd2list) {
-                Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command);
+                server.getCommandManager().executeCommand(server, command);
             }
 
         } else if (rarity == 2) {
@@ -626,7 +766,7 @@ public class Utils {
             else cmd3list.add(cmd3);
 
             for (String command : cmd3list) {
-                Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command);
+                server.getCommandManager().executeCommand(server, command);
             }
 
         } else {
@@ -634,7 +774,7 @@ public class Utils {
             else cmd1list.add(cmd1);
 
             for (String command : cmd1list) {
-                Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command);
+                server.getCommandManager().executeCommand(server, command);
             }
 
         }
@@ -650,10 +790,9 @@ public class Utils {
             min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-rarecandy-min").getInt();
             max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-rarecandy-max").getInt();
         }
-        ItemStack is = ItemStack.builder()
-                .itemType(Type("pixelmon:rare_candy"))
-                .quantity(rn.nextInt(max - min + 1) + min)
-                .build();
+
+        ItemStack is = new ItemStack(PixelmonItems.rareCandy);
+        is.setCount(rn.nextInt(max - min + 1) + min);
         return is;
     }
 
@@ -663,292 +802,292 @@ public class Utils {
             case 1:
                 switch (name) {
                     case "level_ball":
-                        Main.pokemon1ballName = "Level Balls";
+                        PixelHuntForge.pokemon1ballName = "Level Balls";
                         break;
                     case "moon_ball":
-                        Main.pokemon1ballName = "Moon Balls";
+                        PixelHuntForge.pokemon1ballName = "Moon Balls";
                         break;
                     case "friend_ball":
-                        Main.pokemon1ballName = "Friend Balls";
+                        PixelHuntForge.pokemon1ballName = "Friend Balls";
                         break;
                     case "love_ball":
-                        Main.pokemon1ballName = "Love Balls";
+                        PixelHuntForge.pokemon1ballName = "Love Balls";
                         break;
                     case "timer_ball":
-                        Main.pokemon1ballName = "Timer Balls";
+                        PixelHuntForge.pokemon1ballName = "Timer Balls";
                         break;
                     case "nest_ball":
-                        Main.pokemon1ballName = "Nest Balls";
+                        PixelHuntForge.pokemon1ballName = "Nest Balls";
                         break;
                     case "dive_ball":
-                        Main.pokemon1ballName = "Dive Balls";
+                        PixelHuntForge.pokemon1ballName = "Dive Balls";
                         break;
                     case "luxury_ball":
-                        Main.pokemon1ballName = "Luxury Balls";
+                        PixelHuntForge.pokemon1ballName = "Luxury Balls";
                         break;
                     case "heal_ball":
-                        Main.pokemon1ballName = "Heal Balls";
+                        PixelHuntForge.pokemon1ballName = "Heal Balls";
                         break;
                     case "dusk_ball":
-                        Main.pokemon1ballName = "Dusk Balls";
+                        PixelHuntForge.pokemon1ballName = "Dusk Balls";
                         break;
                     case "lure_ball":
-                        Main.pokemon1ballName = "Lure Balls";
+                        PixelHuntForge.pokemon1ballName = "Lure Balls";
                         break;
                     case "sport_ball":
-                        Main.pokemon1ballName = "Sport Balls";
+                        PixelHuntForge.pokemon1ballName = "Sport Balls";
                         break;
                     case "ultra_ball":
-                        Main.pokemon1ballName = "Ultra Balls";
+                        PixelHuntForge.pokemon1ballName = "Ultra Balls";
                         break;
                     case "poke_ball":
-                        Main.pokemon1ballName = "Poke Balls";
+                        PixelHuntForge.pokemon1ballName = "Poke Balls";
                         break;
                     case "quick_ball":
-                        Main.pokemon1ballName = "Quick Balls";
+                        PixelHuntForge.pokemon1ballName = "Quick Balls";
                         break;
                     case "heavy_ball":
-                        Main.pokemon1ballName = "Heavy Balls";
+                        PixelHuntForge.pokemon1ballName = "Heavy Balls";
                         break;
                     case "fast_ball":
-                        Main.pokemon1ballName = "Fast Balls";
+                        PixelHuntForge.pokemon1ballName = "Fast Balls";
                         break;
                     case "repeat_ball":
-                        Main.pokemon1ballName = "Repeat Balls";
+                        PixelHuntForge.pokemon1ballName = "Repeat Balls";
                         break;
                     case "gs_ball":
-                        Main.pokemon1ballName = "GS Balls";
+                        PixelHuntForge.pokemon1ballName = "GS Balls";
                         break;
                     case "great_ball":
-                        Main.pokemon1ballName = "Great Balls";
+                        PixelHuntForge.pokemon1ballName = "Great Balls";
                         break;
                     case "master_ball":
-                        Main.pokemon1ballName = "Master Balls";
+                        PixelHuntForge.pokemon1ballName = "Master Balls";
                         break;
                     case "park_ball":
-                        Main.pokemon1ballName = "Park Balls";
+                        PixelHuntForge.pokemon1ballName = "Park Balls";
                         break;
                     default:
-                        Main.pokemon1ballName = "??? Balls";
+                        PixelHuntForge.pokemon1ballName = "??? Balls";
                         break;
                 }
                 break;
             case 2:
                 switch (name) {
                     case "level_ball":
-                        Main.pokemon2ballName = "Level Balls";
+                        PixelHuntForge.pokemon2ballName = "Level Balls";
                         break;
                     case "moon_ball":
-                        Main.pokemon2ballName = "Moon Balls";
+                        PixelHuntForge.pokemon2ballName = "Moon Balls";
                         break;
                     case "friend_ball":
-                        Main.pokemon2ballName = "Friend Balls";
+                        PixelHuntForge.pokemon2ballName = "Friend Balls";
                         break;
                     case "love_ball":
-                        Main.pokemon2ballName = "Love Balls";
+                        PixelHuntForge.pokemon2ballName = "Love Balls";
                         break;
                     case "timer_ball":
-                        Main.pokemon2ballName = "Timer Balls";
+                        PixelHuntForge.pokemon2ballName = "Timer Balls";
                         break;
                     case "nest_ball":
-                        Main.pokemon2ballName = "Nest Balls";
+                        PixelHuntForge.pokemon2ballName = "Nest Balls";
                         break;
                     case "dive_ball":
-                        Main.pokemon2ballName = "Dive Balls";
+                        PixelHuntForge.pokemon2ballName = "Dive Balls";
                         break;
                     case "luxury_ball":
-                        Main.pokemon2ballName = "Luxury Balls";
+                        PixelHuntForge.pokemon2ballName = "Luxury Balls";
                         break;
                     case "heal_ball":
-                        Main.pokemon2ballName = "Heal Balls";
+                        PixelHuntForge.pokemon2ballName = "Heal Balls";
                         break;
                     case "dusk_ball":
-                        Main.pokemon2ballName = "Dusk Balls";
+                        PixelHuntForge.pokemon2ballName = "Dusk Balls";
                         break;
                     case "lure_ball":
-                        Main.pokemon2ballName = "Lure Balls";
+                        PixelHuntForge.pokemon2ballName = "Lure Balls";
                         break;
                     case "sport_ball":
-                        Main.pokemon2ballName = "Sport Balls";
+                        PixelHuntForge.pokemon2ballName = "Sport Balls";
                         break;
                     case "ultra_ball":
-                        Main.pokemon2ballName = "Ultra Balls";
+                        PixelHuntForge.pokemon2ballName = "Ultra Balls";
                         break;
                     case "poke_ball":
-                        Main.pokemon2ballName = "Poke Balls";
+                        PixelHuntForge.pokemon2ballName = "Poke Balls";
                         break;
                     case "quick_ball":
-                        Main.pokemon2ballName = "Quick Balls";
+                        PixelHuntForge.pokemon2ballName = "Quick Balls";
                         break;
                     case "heavy_ball":
-                        Main.pokemon2ballName = "Heavy Balls";
+                        PixelHuntForge.pokemon2ballName = "Heavy Balls";
                         break;
                     case "fast_ball":
-                        Main.pokemon2ballName = "Fast Balls";
+                        PixelHuntForge.pokemon2ballName = "Fast Balls";
                         break;
                     case "repeat_ball":
-                        Main.pokemon2ballName = "Repeat Balls";
+                        PixelHuntForge.pokemon2ballName = "Repeat Balls";
                         break;
                     case "gs_ball":
-                        Main.pokemon2ballName = "GS Balls";
+                        PixelHuntForge.pokemon2ballName = "GS Balls";
                         break;
                     case "great_ball":
-                        Main.pokemon2ballName = "Great Balls";
+                        PixelHuntForge.pokemon2ballName = "Great Balls";
                         break;
                     case "master_ball":
-                        Main.pokemon2ballName = "Master Balls";
+                        PixelHuntForge.pokemon2ballName = "Master Balls";
                         break;
                     case "park_ball":
-                        Main.pokemon2ballName = "Park Balls";
+                        PixelHuntForge.pokemon2ballName = "Park Balls";
                         break;
                     default:
-                        Main.pokemon2ballName = "??? Balls";
+                        PixelHuntForge.pokemon2ballName = "??? Balls";
                         break;
                 }
                 break;
             case 3:
                 switch (name) {
                     case "level_ball":
-                        Main.pokemon3ballName = "Level Balls";
+                        PixelHuntForge.pokemon3ballName = "Level Balls";
                         break;
                     case "moon_ball":
-                        Main.pokemon3ballName = "Moon Balls";
+                        PixelHuntForge.pokemon3ballName = "Moon Balls";
                         break;
                     case "friend_ball":
-                        Main.pokemon3ballName = "Friend Balls";
+                        PixelHuntForge.pokemon3ballName = "Friend Balls";
                         break;
                     case "love_ball":
-                        Main.pokemon3ballName = "Love Balls";
+                        PixelHuntForge.pokemon3ballName = "Love Balls";
                         break;
                     case "timer_ball":
-                        Main.pokemon3ballName = "Timer Balls";
+                        PixelHuntForge.pokemon3ballName = "Timer Balls";
                         break;
                     case "nest_ball":
-                        Main.pokemon3ballName = "Nest Balls";
+                        PixelHuntForge.pokemon3ballName = "Nest Balls";
                         break;
                     case "dive_ball":
-                        Main.pokemon3ballName = "Dive Balls";
+                        PixelHuntForge.pokemon3ballName = "Dive Balls";
                         break;
                     case "luxury_ball":
-                        Main.pokemon3ballName = "Luxury Balls";
+                        PixelHuntForge.pokemon3ballName = "Luxury Balls";
                         break;
                     case "heal_ball":
-                        Main.pokemon3ballName = "Heal Balls";
+                        PixelHuntForge.pokemon3ballName = "Heal Balls";
                         break;
                     case "dusk_ball":
-                        Main.pokemon3ballName = "Dusk Balls";
+                        PixelHuntForge.pokemon3ballName = "Dusk Balls";
                         break;
                     case "lure_ball":
-                        Main.pokemon3ballName = "Lure Balls";
+                        PixelHuntForge.pokemon3ballName = "Lure Balls";
                         break;
                     case "sport_ball":
-                        Main.pokemon3ballName = "Sport Balls";
+                        PixelHuntForge.pokemon3ballName = "Sport Balls";
                         break;
                     case "ultra_ball":
-                        Main.pokemon3ballName = "Ultra Balls";
+                        PixelHuntForge.pokemon3ballName = "Ultra Balls";
                         break;
                     case "poke_ball":
-                        Main.pokemon3ballName = "Poke Balls";
+                        PixelHuntForge.pokemon3ballName = "Poke Balls";
                         break;
                     case "quick_ball":
-                        Main.pokemon3ballName = "Quick Balls";
+                        PixelHuntForge.pokemon3ballName = "Quick Balls";
                         break;
                     case "heavy_ball":
-                        Main.pokemon3ballName = "Heavy Balls";
+                        PixelHuntForge.pokemon3ballName = "Heavy Balls";
                         break;
                     case "fast_ball":
-                        Main.pokemon3ballName = "Fast Balls";
+                        PixelHuntForge.pokemon3ballName = "Fast Balls";
                         break;
                     case "repeat_ball":
-                        Main.pokemon3ballName = "Repeat Balls";
+                        PixelHuntForge.pokemon3ballName = "Repeat Balls";
                         break;
                     case "gs_ball":
-                        Main.pokemon3ballName = "GS Balls";
+                        PixelHuntForge.pokemon3ballName = "GS Balls";
                         break;
                     case "great_ball":
-                        Main.pokemon3ballName = "Great Balls";
+                        PixelHuntForge.pokemon3ballName = "Great Balls";
                         break;
                     case "master_ball":
-                        Main.pokemon3ballName = "Master Balls";
+                        PixelHuntForge.pokemon3ballName = "Master Balls";
                         break;
                     case "park_ball":
-                        Main.pokemon3ballName = "Park Balls";
+                        PixelHuntForge.pokemon3ballName = "Park Balls";
                         break;
                     default:
-                        Main.pokemon3ballName = "??? Balls";
+                        PixelHuntForge.pokemon3ballName = "??? Balls";
                         break;
                 }
                 break;
             case 4:
                 switch (name) {
                     case "level_ball":
-                        Main.pokemon4ballName = "Level Balls";
+                        PixelHuntForge.pokemon4ballName = "Level Balls";
                         break;
                     case "moon_ball":
-                        Main.pokemon4ballName = "Moon Balls";
+                        PixelHuntForge.pokemon4ballName = "Moon Balls";
                         break;
                     case "friend_ball":
-                        Main.pokemon4ballName = "Friend Balls";
+                        PixelHuntForge.pokemon4ballName = "Friend Balls";
                         break;
                     case "love_ball":
-                        Main.pokemon4ballName = "Love Balls";
+                        PixelHuntForge.pokemon4ballName = "Love Balls";
                         break;
                     case "timer_ball":
-                        Main.pokemon4ballName = "Timer Balls";
+                        PixelHuntForge.pokemon4ballName = "Timer Balls";
                         break;
                     case "nest_ball":
-                        Main.pokemon4ballName = "Nest Balls";
+                        PixelHuntForge.pokemon4ballName = "Nest Balls";
                         break;
                     case "dive_ball":
-                        Main.pokemon4ballName = "Dive Balls";
+                        PixelHuntForge.pokemon4ballName = "Dive Balls";
                         break;
                     case "luxury_ball":
-                        Main.pokemon4ballName = "Luxury Balls";
+                        PixelHuntForge.pokemon4ballName = "Luxury Balls";
                         break;
                     case "heal_ball":
-                        Main.pokemon4ballName = "Heal Balls";
+                        PixelHuntForge.pokemon4ballName = "Heal Balls";
                         break;
                     case "dusk_ball":
-                        Main.pokemon4ballName = "Dusk Balls";
+                        PixelHuntForge.pokemon4ballName = "Dusk Balls";
                         break;
                     case "lure_ball":
-                        Main.pokemon4ballName = "Lure Balls";
+                        PixelHuntForge.pokemon4ballName = "Lure Balls";
                         break;
                     case "sport_ball":
-                        Main.pokemon4ballName = "Sport Balls";
+                        PixelHuntForge.pokemon4ballName = "Sport Balls";
                         break;
                     case "ultra_ball":
-                        Main.pokemon4ballName = "Ultra Balls";
+                        PixelHuntForge.pokemon4ballName = "Ultra Balls";
                         break;
                     case "poke_ball":
-                        Main.pokemon4ballName = "Poke Balls";
+                        PixelHuntForge.pokemon4ballName = "Poke Balls";
                         break;
                     case "quick_ball":
-                        Main.pokemon4ballName = "Quick Balls";
+                        PixelHuntForge.pokemon4ballName = "Quick Balls";
                         break;
                     case "heavy_ball":
-                        Main.pokemon4ballName = "Heavy Balls";
+                        PixelHuntForge.pokemon4ballName = "Heavy Balls";
                         break;
                     case "fast_ball":
-                        Main.pokemon4ballName = "Fast Balls";
+                        PixelHuntForge.pokemon4ballName = "Fast Balls";
                         break;
                     case "repeat_ball":
-                        Main.pokemon4ballName = "Repeat Balls";
+                        PixelHuntForge.pokemon4ballName = "Repeat Balls";
                         break;
                     case "gs_ball":
-                        Main.pokemon4ballName = "GS Balls";
+                        PixelHuntForge.pokemon4ballName = "GS Balls";
                         break;
                     case "great_ball":
-                        Main.pokemon4ballName = "Great Balls";
+                        PixelHuntForge.pokemon4ballName = "Great Balls";
                         break;
                     case "master_ball":
-                        Main.pokemon4ballName = "Master Balls";
+                        PixelHuntForge.pokemon4ballName = "Master Balls";
                         break;
                     case "park_ball":
-                        Main.pokemon4ballName = "Park Balls";
+                        PixelHuntForge.pokemon4ballName = "Park Balls";
                         break;
                     default:
-                        Main.pokemon4ballName = "??? Balls";
+                        PixelHuntForge.pokemon4ballName = "??? Balls";
                         break;
                 }
                 break;
@@ -963,47 +1102,12 @@ public class Utils {
             min = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-balls-min").getInt();
             max = Config.getInstance().getConfig().getNode("pixelhunt", "rewards", "rare-balls-max").getInt();
         }
-        ItemStack is = ItemStack.builder()
-                .itemType(Type("pixelmon:" + name))
-                .quantity(rn.nextInt(max - min + 1) + min)
-                .build();
+
+        ItemStack is = new ItemStack(Item.getByNameOrId("pixelmon:" + name));
+        is.setCount(rn.nextInt(max - min + 1) + min);
         return is;
     }
 
-    public ItemType Type(String item) {
-        ItemType i = Sponge.getGame().getRegistry().getType(ItemType.class, item).get();
-        return i;
-    }
-
-    public static String formatText(final String input) {
-        // Set up a list of valid formatting codes.
-        final List<Character> validFormattingCharacters = Arrays.asList
-                (
-                        // Color numbers.
-                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                        // Color letters, lower and upper case.
-                        'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F',
-                        // Other formatting codes.
-                        'k', 'l', 'm', 'n', 'o', 'r'
-                );
-
-        // Start replacing our ampersands.
-        final StringBuilder mutableInput = new StringBuilder(input);
-        for (int i = 0; i < mutableInput.length(); i++) {
-            // Is the character that's currently being checked an ampersand?
-            if (mutableInput.charAt(i) == '&') {
-                // Is the loop value lower than the total length of the input String? Let's not check out of bounds.
-                if ((i + 1) < mutableInput.length()) {
-                    // Look ahead: Does the next character contain a known formatting character? Replace the ampersand!
-                    if (validFormattingCharacters.contains(mutableInput.charAt(i + 1)))
-                        mutableInput.setCharAt(i, '§');
-                }
-            }
-        }
-
-        // Replace our old input String with the one that we fixed formatting on.
-        return mutableInput.toString();
-    }
 
     // Takes a config String, and replaces a single placeholder with the proper replacement as many times as needed.
     public static String replacePlaceholder(final String input, final String placeholder, final String replacement) {
@@ -1030,10 +1134,10 @@ public class Utils {
     }
 
     public static String prefix() {
-        return Utils.formatText(Config.getInstance().getConfig().getNode("pixelhunt", "lang", "prefix").getString());
+        return regex(Config.getInstance().getConfig().getNode("pixelhunt", "lang", "prefix").getString());
     }
 
     public static String lang(String node) {
-        return Utils.formatText(Config.getInstance().getConfig().getNode("pixelhunt", "lang", node).getString());
+        return regex(Config.getInstance().getConfig().getNode("pixelhunt", "lang", node).getString());
     }
 }

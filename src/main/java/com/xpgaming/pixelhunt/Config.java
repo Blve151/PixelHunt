@@ -1,11 +1,9 @@
 package com.xpgaming.pixelhunt;
 
-import com.google.inject.Inject;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.spongepowered.api.config.ConfigDir;
+import info.pixelmon.repack.ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import info.pixelmon.repack.ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import info.pixelmon.repack.ninja.leaping.configurate.loader.ConfigurationLoader;
+import info.pixelmon.repack.ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +14,8 @@ public class Config {
     public static Config getInstance() {
         return instance;
     }
+
     private CommentedConfigurationNode config;
-    @Inject
-    @ConfigDir(sharedRoot = false) private File configDir;
     String path = "config"+File.separator+"PixelHunt";
     private File configFile = new File(path, "PixelHunt.conf");
     private ConfigurationLoader<CommentedConfigurationNode> configLoader = HoconConfigurationLoader.builder().setFile(configFile).build();
@@ -37,10 +34,8 @@ public class Config {
             huntconfig.getNode("gui","gui-book-display").setValue("&a-=-= Help =-=-");
             huntconfig.getNode("gui","gui-book-text").setComment("Help Book Item Lore");
             huntconfig.getNode("gui","gui-book-text").setValue("Any Pokemon that's on this list will receive an IV boost when caught (also temporarily marked in the wild with red particles). If it has one of the listed natures, you get greater rewards and a higher IV boost!");
-
             huntconfig.getNode("gui","gui-glass-pane").setComment("Glass pane meta deta for first and second pane respectively.");
             huntconfig.getNode("gui","gui-glass-pane").setValue("3, 11");
-
             huntconfig.getNode("general","announcement-timer").setComment("The timer (in minutes) for the global hunt announcement");
             huntconfig.getNode("general","announcement-timer").setValue(100.00);
             huntconfig.getNode("general","allow-legendaries").setComment("Should legendary/rare Pokémon be allowed in the hunt?");
@@ -101,8 +96,12 @@ public class Config {
             huntconfig.getNode("rewards","custom-rare-cmd").setValue("give %player% diamond_block 1;give %player% gold_block 1");
             huntconfig.getNode("rewards","custom-rare-msg").setValue("1 Diamond Block, 1 Gold Block");
             huntconfig.getNode("lang").setComment("You can use colour codes here - &a, &b, &c etc.");
-            huntconfig.getNode("lang","prefix").setValue("&6Hunt&f");
+            huntconfig.getNode("lang","prefix").setValue("&6Hunt&f ");
             huntconfig.getNode("lang","announcement-message").setValue("Use &6/hunt&f to view the current Pokémon hunt.");
+            huntconfig.getNode("lang","only-players").setComment("/hunt");
+            huntconfig.getNode("lang","only-players").setValue("&cOnly players can use this command!");
+            huntconfig.getNode("lang","invalid-usage").setComment("/hunt <arg>");
+            huntconfig.getNode("lang","invalid-usage").setValue("&cInvalid usage.");
             huntconfig.getNode("lang","reload-message").setComment("/huntreload");
             huntconfig.getNode("lang","reload-message").setValue("&e&lConfig reloaded!");
             huntconfig.getNode("lang","selected-random").setComment("/newhunt #");
@@ -141,9 +140,7 @@ public class Config {
         if (!configFile.exists()) {
             try {
                 configCreate();
-            } catch (ObjectMappingException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ObjectMappingException | IOException e) {
                 e.printStackTrace();
             }
         } else
@@ -158,9 +155,7 @@ public class Config {
         if (!configFile.exists()) {
             try {
                 configCreate();
-            } catch (ObjectMappingException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ObjectMappingException | IOException e) {
                 e.printStackTrace();
             }
         } else
@@ -179,8 +174,4 @@ public class Config {
         }
     }
 
-    public void saveAndLoadConfig() {
-        configSave();
-        configLoad();
-    }
 }
