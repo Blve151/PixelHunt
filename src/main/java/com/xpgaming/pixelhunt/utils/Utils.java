@@ -556,7 +556,7 @@ public class Utils {
                 date = date.plusHours(hours);
                 PixelHuntForge.pokemon4expiry = date;
 
-                huntTimer3 = Task.builder()
+                huntTimer4 = Task.builder()
                         .execute(task -> {
                             sendServer(prefix() + Config.getInstance().getConfig().getNode("pixelhunt", "lang", "hunt-ended").getString().replace("<pokemon>", PixelHuntForge.pokemon4));
                             randomisePokemon(slot);

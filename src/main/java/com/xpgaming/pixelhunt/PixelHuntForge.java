@@ -36,7 +36,7 @@ public class PixelHuntForge {
 
     public static final String MOD_ID = "pixelhuntforge";
     public static final String MOD_NAME = "PixelHuntForge";
-    public static final String VERSION = "2.0.0";
+    public static final String VERSION = "2.0.1";
 
     private static String separator = FileSystems.getDefault().getSeparator();
     public static String primaryPath = "config" + separator;
