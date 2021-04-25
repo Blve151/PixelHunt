@@ -1,0 +1,44 @@
+# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
+# The overall format is standard TOML format, v0.5.0.
+# Note that there are a couple of TOML lists in this file.
+# Find more information on toml format here:  https://github.com/toml-lang/toml
+
+# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
+modLoader="javafml" #mandatory
+
+# A version range to match for said mod loader - for regular FML @Mod it will be the minecraft version (without the 1.)
+loaderVersion="[24,)" #mandatory
+
+# A list of mods - how many allowed here is determined by the individual mod loader
+[[mods]]
+
+# The modid of the mod
+modId="${modId}" #mandatory
+# The version number of the mod
+version="${version}" #mandatory
+# A display name for the mod
+displayName="PixelHuntForge" #mandatory
+description='''
+Lets you go on Pixelmon hunt
+'''
+
+[[dependencies.pixelhuntforge]]
+modId="forge"
+mandatory=true
+versionRange="[24,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.pixelhuntforge]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.12.2]"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.pixelhuntforge]]
+modId="pixelmon"
+mandatory=true
+versionRange="[8,]"
+ordering="NONE"
+side="BOTH"
