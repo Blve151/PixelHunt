@@ -35,9 +35,6 @@ targetCompatibility = '1.8'
 
 repositories {
     jcenter()
-    flatDir {
-        dirs 'libs'
-    }
     ivy {
         url "https://download.nodecdn.net/containers/reforged/server/release"
         metadataSources {
@@ -46,13 +43,14 @@ repositories {
         patternLayout {
             artifact "[revision]/[artifact].[ext]"
         }
+        maven { url "https://jitpack.io" }
     }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:" + modMinecraftVersion + "-" + modForgeVersion
     implementation "pixelmon:Pixelmon-1.12.2-8.1.2-server:8.1.2"
-    implementation 'com.github.landonjw:GooeyLibs:2.0.2'
+    implementation 'com.github.landonjw:GooeyLibs:v2.0.3'
 }
 
 jar {
