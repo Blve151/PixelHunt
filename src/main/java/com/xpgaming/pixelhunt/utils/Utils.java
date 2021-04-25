@@ -35,7 +35,7 @@ import static com.xpgaming.pixelhunt.PixelHuntForge.*;
 
 public class Utils {
 
-    private static Utils instance = new Utils();
+    private static final Utils instance = new Utils();
 
     public static Task announcementTask = null;
     public static Task huntTimer1 = null;

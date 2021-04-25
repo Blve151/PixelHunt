@@ -17,10 +17,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
-import javax.lang.model.element.ElementVisitor;
 import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,7 +27,8 @@ import java.time.LocalDateTime;
         modid = PixelHuntForge.MOD_ID,
         name = PixelHuntForge.MOD_NAME,
         version = PixelHuntForge.VERSION,
-        acceptableRemoteVersions = "*"
+        acceptableRemoteVersions = "*",
+        dependencies = "required-after:pixelmon;required-after:gooeylibs2"
 )
 public class PixelHuntForge {
 
@@ -38,7 +36,7 @@ public class PixelHuntForge {
     public static final String MOD_NAME = "PixelHuntForge";
     public static final String VERSION = "2.0.1";
 
-    private static String separator = FileSystems.getDefault().getSeparator();
+    private static final String separator = FileSystems.getDefault().getSeparator();
     public static String primaryPath = "config" + separator;
     public static String commandConfigPath = "config" + separator + "PixelHunt" + separator;
     public static Path configPath = Paths.get(primaryPath, "PixelHunt.conf");
