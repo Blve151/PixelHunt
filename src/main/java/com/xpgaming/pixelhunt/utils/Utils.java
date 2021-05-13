@@ -7,6 +7,7 @@ import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.economy.IPixelmonBankAccount;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.config.PixelmonItems;
+import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Stats;
 import com.pixelmonmod.pixelmon.enums.EnumNature;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.items.ItemPixelmonSprite;
@@ -158,12 +159,12 @@ public class Utils {
             case 1:
                 cancelTimers(1);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(PixelHuntForge.pokemon1)) {
+                    PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(true).name);
+                else PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(PixelHuntForge.pokemon1) || Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon1)) == null) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(true).name);
+                    else PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(false).name);
                 }
                 PixelHuntForge.nature1 = randomEnum(EnumNature.class).toString();
                 PixelHuntForge.nature1b = randomEnum(EnumNature.class).toString();
@@ -194,12 +195,12 @@ public class Utils {
             case 2:
                 cancelTimers(2);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(pokemon2)) {
+                    pokemon2 = (EnumSpecies.randomPoke(true).name);
+                else pokemon2 = (EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(PixelHuntForge.pokemon2) || Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon2)) == null) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        pokemon2 = (EnumSpecies.randomPoke(true).name);
+                    else pokemon2 = (EnumSpecies.randomPoke(false).name);
                 }
                 PixelHuntForge.nature2 = randomEnum(EnumNature.class).toString();
                 PixelHuntForge.nature2b = randomEnum(EnumNature.class).toString();
@@ -230,12 +231,12 @@ public class Utils {
             case 3:
                 cancelTimers(3);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(PixelHuntForge.pokemon3)) {
+                    PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(true).name);
+                else PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(pokemon3) || Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon3)) == null) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(true).name);
+                    else PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(false).name);
                 }
                 PixelHuntForge.nature3 = randomEnum(EnumNature.class).toString();
                 PixelHuntForge.nature3b = randomEnum(EnumNature.class).toString();
@@ -266,12 +267,12 @@ public class Utils {
             case 4:
                 cancelTimers(4);
                 if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                    PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
-                while (getExcludedPokemon().contains(PixelHuntForge.pokemon4)) {
+                    PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(true).name);
+                else PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(false).name);
+                while (getExcludedPokemon().contains(PixelHuntForge.pokemon4) || Pixelmon.pokemonFactory.create(EnumSpecies.getFromNameAnyCase(PixelHuntForge.pokemon4)) == null) {
                     if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                        PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-                    else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                        PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(true).name);
+                    else PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(false).name);
                 }
                 PixelHuntForge.nature4 = randomEnum(EnumNature.class).toString();
                 PixelHuntForge.nature4b = randomEnum(EnumNature.class).toString();
@@ -331,9 +332,9 @@ public class Utils {
         String[] numString = Config.getInstance().getConfig().getNode("pixelhunt", "gui", node).getString().split(", ");
         switch (pos) {
             case 1:
-                return Integer.valueOf(numString[0]);
+                return Integer.parseInt(numString[0]);
             case 2:
-                return Integer.valueOf(numString[1]);
+                return Integer.parseInt(numString[1]);
             default:
                 return -1;
         }
@@ -407,14 +408,13 @@ public class Utils {
         return ItemPixelmonSprite.getPhoto(pokemon);
     }
 
-
-    public static String sanitisePokemon(String poke) {
-        if (poke.equalsIgnoreCase("MrMime")) return "Mr. Mime";
-        else if (poke.equalsIgnoreCase("MimeJr")) return "Mime Jr.";
-        else if (poke.equalsIgnoreCase("Nidoranfemale")) return "Nidoran\u2640";
-        else if (poke.equalsIgnoreCase("Nidoranmale")) return "Nidoran\u2642";
-        else if (poke.equalsIgnoreCase("Farfetchd")) return "Farfetch'd";
-        return poke;
+    // clean up 8.2 deprecated fields... when i feel like it
+    public static int getTotalIVCount (Stats stats){
+        int oldIVs = 0;
+        for (int i : stats.ivs.getArray()) {
+            oldIVs += i;
+        }
+        return oldIVs;
     }
 
     public String calculateTimeDifference(LocalDateTime from, LocalDateTime to) {
@@ -619,12 +619,12 @@ public class Utils {
     public void initialisePokemon() {
         cancelTimers(0);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+            PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(true).name);
+        else PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(false).name);
         while (getExcludedPokemon().contains(PixelHuntForge.pokemon1)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else PixelHuntForge.pokemon1 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(true).name);
+            else PixelHuntForge.pokemon1 = (EnumSpecies.randomPoke(false).name);
         }
         PixelHuntForge.nature1 = randomEnum(EnumNature.class).toString();
         PixelHuntForge.nature1b = randomEnum(EnumNature.class).toString();
@@ -647,12 +647,12 @@ public class Utils {
         } else PixelHuntForge.pokemon1rc = randomRareCandy(0);
         startTimer(1);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+            pokemon2 = (EnumSpecies.randomPoke(true).name);
+        else pokemon2 = (EnumSpecies.randomPoke(false).name);
         while (getExcludedPokemon().contains(pokemon2)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else pokemon2 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                pokemon2 = (EnumSpecies.randomPoke(true).name);
+            else pokemon2 = (EnumSpecies.randomPoke(false).name);
         }
         PixelHuntForge.nature2 = randomEnum(EnumNature.class).toString();
         PixelHuntForge.nature2b = randomEnum(EnumNature.class).toString();
@@ -675,12 +675,12 @@ public class Utils {
         } else PixelHuntForge.pokemon2rc = randomRareCandy(0);
         startTimer(2);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+            PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(true).name);
+        else PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(false).name);
         while (getExcludedPokemon().contains(PixelHuntForge.pokemon3)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else PixelHuntForge.pokemon3 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(true).name);
+            else PixelHuntForge.pokemon3 = (EnumSpecies.randomPoke(false).name);
         }
         PixelHuntForge.nature3 = randomEnum(EnumNature.class).toString();
         PixelHuntForge.nature3b = randomEnum(EnumNature.class).toString();
@@ -703,12 +703,12 @@ public class Utils {
         } else PixelHuntForge.pokemon3rc = randomRareCandy(0);
         startTimer(3);
         if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-            PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-        else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+            PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(true).name);
+        else PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(false).name);
         while (getExcludedPokemon().contains(PixelHuntForge.pokemon4)) {
             if (Config.getInstance().getConfig().getNode("pixelhunt", "general", "allow-legendaries").getBoolean())
-                PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(true).name);
-            else PixelHuntForge.pokemon4 = sanitisePokemon(EnumSpecies.randomPoke(false).name);
+                PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(true).name);
+            else PixelHuntForge.pokemon4 = (EnumSpecies.randomPoke(false).name);
         }
         PixelHuntForge.nature4 = randomEnum(EnumNature.class).toString();
         PixelHuntForge.nature4b = randomEnum(EnumNature.class).toString();

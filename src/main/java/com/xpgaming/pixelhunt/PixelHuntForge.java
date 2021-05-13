@@ -34,7 +34,7 @@ public class PixelHuntForge {
 
     public static final String MOD_ID = "pixelhuntforge";
     public static final String MOD_NAME = "PixelHuntForge";
-    public static final String VERSION = "2.0.1";
+    public static final String VERSION = "2.0.2";
 
     private static final String separator = FileSystems.getDefault().getSeparator();
     public static String primaryPath = "config" + separator;
@@ -89,7 +89,7 @@ public class PixelHuntForge {
     }
 
     @Mod.EventHandler
-    public void init(FMLServerStartingEvent event) {
+    public void serverStart(FMLServerStartingEvent event) {
         Utils.getInstance().initialisePokemon();
         Utils.reloadAnnouncementTask();
         event.registerServerCommand(new HuntCMD());

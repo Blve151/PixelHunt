@@ -26,23 +26,23 @@ public class HuntCMD extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return sender.canUseCommand(0, "pixelhunt.command.admin") ? "/hunt (reload)/(newhunt (slot))" : "/hunt";
+        return sender.canUseCommand(0, "pixelhuntforge.command.admin") ? "/hunt (reload)/(newhunt (slot))" : "/hunt";
     }
 
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         List<String> possibleArgs = new ArrayList<>();
         if(args.length == 1){
-            if(sender.canUseCommand(0, "pixelhunt.command.admin")){
+            if(sender.canUseCommand(0, "pixelhuntforge.command.admin")){
                 possibleArgs.add("reload");
             }
-            if(sender.canUseCommand(0, "pixelhunt.command.admin")){
+            if(sender.canUseCommand(0, "pixelhuntforge.command.admin")){
                 possibleArgs.add("newhunt");
             }
         }
 
         if(args.length == 2){
-            if(sender.canUseCommand(0, "pixelhunt.command.admin")){
+            if(sender.canUseCommand(0, "pixelhuntforge.command.admin")){
                 possibleArgs.add("1");
                 possibleArgs.add("2");
                 possibleArgs.add("3");
@@ -64,7 +64,7 @@ public class HuntCMD extends CommandBase {
             EntityPlayerMP player = (EntityPlayerMP) sender;
             UIManager.openUIForcefully(player, HuntUI.menu(player));
         }else{
-            if(!sender.canUseCommand(0, "pixelhunt.command.admin")){
+            if(!sender.canUseCommand(0, "pixelhuntforge.command.admin")){
                 sender.sendMessage(new TextComponentString(regex(Utils.lang("invalid-usage"))));
                 sender.sendMessage(new TextComponentString(getUsage(sender)));
                 return;
